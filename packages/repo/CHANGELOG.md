@@ -1,5 +1,11 @@
 # @paulhalleux/repo
 
+## 0.1.2
+
+### Patch Changes
+
+- 7c4d6e9: fix repo default project
+
 ## 0.1.1
 
 ### Patch Changes

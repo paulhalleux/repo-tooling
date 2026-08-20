@@ -1,6 +1,6 @@
 {
   "name": "@paulhalleux/repo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Repository bootstrap, synchronization, validation, and migration tooling.",
   "type": "module",
   "bin": {
