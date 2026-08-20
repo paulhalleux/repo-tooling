@@ -1,0 +1,14 @@
+{
+  "name": "@paulhalleux/typedoc-config",
+  "version": "0.0.0",
+  "files": [
+    "typedoc.json"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./typedoc.json"
+  },
+  "peerDependencies": {
+    "typedoc": ">=0.28.20 <0.29.0"
+  }
+}

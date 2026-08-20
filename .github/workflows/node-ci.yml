@@ -1,0 +1,58 @@
+name: TypeScript Library
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use.
+        required: false
+        type: string
+        default: "24"
+
+      run-tests:
+        description: Whether to run tests.
+        required: false
+        type: boolean
+        default: true
+
+      run-build:
+        description: Whether to run the build.
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check
+        run: pnpm check
+
+      - name: Test
+        if: inputs.run-tests
+        run: pnpm test
+
+      - name: Build
+        if: inputs.run-build
+        run: pnpm build

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "cleanOutputDir": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "includeVersion": true,
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": true
+  },
+  "treatValidationWarningsAsErrors": true,
+  "useFirstParagraphOfCommentAsSummary": true,
+  "validation": {
+    "invalidLink": true,
+    "notDocumented": true,
+    "notExported": true
+  }
+}

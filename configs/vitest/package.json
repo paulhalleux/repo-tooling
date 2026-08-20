@@ -1,0 +1,28 @@
+{
+  "name": "@paulhalleux/vitest-config",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "vitest": ">=3.2.4"
+  },
+  "devDependencies": {
+    "@paulhalleux/tsconfig": "workspace:*",
+    "@paulhalleux/tsdown-config": "workspace:*",
+    "tsdown": "^0.22.14",
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.4"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

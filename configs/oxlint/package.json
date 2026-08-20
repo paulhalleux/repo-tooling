@@ -1,0 +1,28 @@
+{
+  "name": "@paulhalleux/oxlint-config",
+  "version": "0.0.0",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "peerDependencies": {
+    "oxlint": ">=1.16.0"
+  },
+  "devDependencies": {
+    "@paulhalleux/tsconfig": "workspace:*",
+    "@paulhalleux/tsdown-config": "workspace:*",
+    "oxlint": "^1.77.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^6.0.3"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

@@ -1,0 +1,6 @@
+packages:
+  - "configs/*"
+  - "packages/*"
+allowBuilds:
+  esbuild: true
+  msw: true

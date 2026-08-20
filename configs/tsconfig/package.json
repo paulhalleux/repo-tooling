@@ -1,0 +1,16 @@
+{
+  "name": "@paulhalleux/tsconfig",
+  "version": "0.0.0",
+  "files": [
+    "react.json",
+    "library.json"
+  ],
+  "type": "module",
+  "exports": {
+    "./library": "./library.json",
+    "./react": "./react.json"
+  },
+  "peerDependencies": {
+    "typescript": ">=6.0.0"
+  }
+}
