@@ -3,27 +3,10 @@
     "base": {
       "files": [
         {
-          "source": "base/.github/pull_request_template.md",
-          "target": ".github/pull_request_template.md"
-        }
-      ]
-    },
-    "typescript-library": {
-      "extends": [
-        "base"
-      ],
-      "files": [
-        {
           "source": "typescript-library/.github/workflows/ci.yml",
           "target": ".github/workflows/ci.yml"
         }
       ]
-    },
-    "react-library": {
-      "extends": [
-        "typescript-library"
-      ],
-      "files": []
     }
   }
 }
