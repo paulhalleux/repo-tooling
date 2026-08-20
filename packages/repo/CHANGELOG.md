@@ -1,5 +1,11 @@
 # @paulhalleux/repo
 
+## 0.2.2
+
+### Patch Changes
+
+- 9522982: fix: ci permissions & auth
+
 ## 0.2.1
 
 ### Patch Changes
