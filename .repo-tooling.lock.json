@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "files": {
+    ".agents/skills/adapter-boundaries/SKILL.md": {
+      "hash": "ee08986780ce94a6a23103b5a2e5204e857ab30abfd97eec0dcf88860e4324a5",
+      "source": "ai/skills/adapter-boundaries/SKILL.md"
+    },
+    ".agents/skills/architecture-design/SKILL.md": {
+      "hash": "6cdaa67126ad4e3e78c11126514a9b11721b8473ac1fb60816e91590712110d3",
+      "source": "ai/skills/architecture-design/SKILL.md"
+    },
+    ".agents/skills/architecture-review/SKILL.md": {
+      "hash": "9f4ae01cd9ab2339da2d849846bb76f403d08c77c2f3da975c4f7a53705a2018",
+      "source": "ai/skills/architecture-review/SKILL.md"
+    },
+    ".agents/skills/debug-failure/SKILL.md": {
+      "hash": "102a98587e3c4a13233aece31f8d26e66d18831e214071dc3eb5b2e066395887",
+      "source": "ai/skills/debug-failure/SKILL.md"
+    },
+    ".agents/skills/extensibility-design/SKILL.md": {
+      "hash": "964e4e3eedf88045ef430fbde5e3c709d6a1cc99d00d8fd760aea40c11aa73e6",
+      "source": "ai/skills/extensibility-design/SKILL.md"
+    },
+    ".agents/skills/frontend-library-development/SKILL.md": {
+      "hash": "b9b02022ef7b28b778913d7239e2fd1d45f8a2bd6f14f69242107177dc16d825",
+      "source": "ai/skills/frontend-library-development/SKILL.md"
+    },
+    ".agents/skills/frontend-library-review/SKILL.md": {
+      "hash": "c4d71616c7d3e6cb4933a1afc5cd8f66038a27fb0fa7493015ed6a58c5d2864d",
+      "source": "ai/skills/frontend-library-review/SKILL.md"
+    },
+    ".agents/skills/handoff/SKILL.md": {
+      "hash": "0e9e137d170062d890158cef2709b2a89540d969d708e12db3f6bb552f772d04",
+      "source": "ai/skills/handoff/SKILL.md"
+    },
+    ".agents/skills/idea-to-spec/SKILL.md": {
+      "hash": "15fc725bd9d135f365508168f582a10f36f803a78378698958066813cd0951a9",
+      "source": "ai/skills/idea-to-spec/SKILL.md"
+    },
+    ".agents/skills/implement-feature/SKILL.md": {
+      "hash": "804f055f407dc7bbb02991ada04bb832e996654b02d67ef37515fb7bfba00630",
+      "source": "ai/skills/implement-feature/SKILL.md"
+    },
+    ".agents/skills/jsdoc-contracts/SKILL.md": {
+      "hash": "880d687b13aaaa0381489da3e1f9654e7c67f50cc635577023198475c66def7b",
+      "source": "ai/skills/jsdoc-contracts/SKILL.md"
+    },
+    ".agents/skills/library-testing/SKILL.md": {
+      "hash": "ad7192eab763b02ec9983377ecd575a94832683402c3e3cf19420beffa196ca2",
+      "source": "ai/skills/library-testing/SKILL.md"
+    },
+    ".agents/skills/package-distribution/SKILL.md": {
+      "hash": "7d2496d16c5690852721b1c2feddee6ba8011ed17e090b924adb4c1f6a23ed29",
+      "source": "ai/skills/package-distribution/SKILL.md"
+    },
+    ".agents/skills/public-api-design/SKILL.md": {
+      "hash": "9b2116c3ca864715c7d45eacf2ca8e01552f0b518b06e44dd72ede90f12945c7",
+      "source": "ai/skills/public-api-design/SKILL.md"
+    },
+    ".agents/skills/public-api-review/SKILL.md": {
+      "hash": "6fe29d8c1576617b588fccb346e0840473d4ad8b30e935567c07097f88cfd60c",
+      "source": "ai/skills/public-api-review/SKILL.md"
+    },
+    ".agents/skills/react-adapter/SKILL.md": {
+      "hash": "d6226a140f895ea37f910000a18b890ed7107ec9c576fd15022269e6fc781dbe",
+      "source": "ai/skills/react-adapter/SKILL.md"
+    },
+    ".agents/skills/refactor/SKILL.md": {
+      "hash": "4c34e54fbe5c0cd33eb5dd8566ce4f32fadbc72f51aedeb47c8955fb22785322",
+      "source": "ai/skills/refactor/SKILL.md"
+    },
+    ".agents/skills/review-diff/SKILL.md": {
+      "hash": "875c34be751309f2ecd577489b2f1d13843e30a39cc26d61a9687ceae6ffc30d",
+      "source": "ai/skills/review-diff/SKILL.md"
+    },
+    ".agents/skills/simplicity-review/SKILL.md": {
+      "hash": "c57ce11af342776403f14e9010d35b3cd0a094a590a2a1dcea02a701af468555",
+      "source": "ai/skills/simplicity-review/SKILL.md"
+    },
+    ".agents/skills/task-spec/SKILL.md": {
+      "hash": "1b7ef6acad9f345baf1a6e9ab2df1baabddafabcd32b738f78d9882239b33f75",
+      "source": "ai/skills/task-spec/SKILL.md"
+    },
+    ".agents/skills/typescript-api-design/SKILL.md": {
+      "hash": "ec742089333911e735f536c0697404fe576a7581d8d7e7a451571d7f3fe49305",
+      "source": "ai/skills/typescript-api-design/SKILL.md"
+    },
+    ".codex/agents/architect.toml": {
+      "hash": "7136c0f5a02b6a6f3e766db8a017d280a684417704394af7098b2b6f92afccc7",
+      "source": "ai/agents/architect.toml"
+    },
+    ".codex/agents/explorer.toml": {
+      "hash": "2dd0002c4f75ac458e7e07ea15b36aba9376cae40ac8c89ae17d1486bef893cd",
+      "source": "ai/agents/explorer.toml"
+    },
+    ".codex/agents/reviewer.toml": {
+      "hash": "f0a14d8a4e0a9da06df3fb9a3014dca4a750d209145375d00641f8c8ae7a4ecf",
+      "source": "ai/agents/reviewer.toml"
+    },
+    ".codex/agents/tester.toml": {
+      "hash": "8c7534a14d1e005c8547d0e107046e059634351ca958ae2ad89bbfcce9124dc3",
+      "source": "ai/agents/tester.toml"
+    },
+    ".codex/agents/worker.toml": {
+      "hash": "867be5814a0d20eb2221b2c85ebc34dfa8053fe3241a0a1469c0b879830a63d6",
+      "source": "ai/agents/worker.toml"
+    }
+  }
+}

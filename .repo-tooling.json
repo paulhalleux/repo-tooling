@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    "base"
+  ],
+  "variables": {
+    "githubOwner": "paulhalleux",
+    "repositoryName": "repo-tooling"
+  }
+}
