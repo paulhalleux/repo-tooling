@@ -1,5 +1,11 @@
 # @paulhalleux/repo
 
+## 0.3.1
+
+### Patch Changes
+
+- 09f8903: make architect agent use medium effort
+
 ## 0.3.0
 
 ### Minor Changes
