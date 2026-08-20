@@ -5,6 +5,7 @@ import pc from 'picocolors';
 
 import { runAiListCommand } from './commands/ai.js';
 import { runCheckCommand } from './commands/check.js';
+import { runCreateCommand } from './commands/create.js';
 import { runInitCommand } from './commands/init.js';
 import { runMigrateCommand } from './commands/migrate.js';
 import { runSyncCommand } from './commands/sync.js';
@@ -19,6 +20,26 @@ program
     'Bootstrap, synchronize, validate, and migrate repository tooling.',
   )
   .version(PACKAGE_VERSION);
+
+program
+  .command('create')
+  .description('Create a project from a bundled scaffold.')
+  .argument('[scaffold]', 'Scaffold ID, optionally followed by /<directory>.')
+  .argument('[directory]', 'Directory to create.')
+  .option('--package-name <name>', 'Package name written to the scaffold.')
+  .option('-l, --list', 'List available scaffolds.', false)
+  .action(async (
+    scaffold: string | undefined,
+    directory: string | undefined,
+    options: { packageName?: string; list: boolean },
+  ) => {
+    await runCreateCommand(process.cwd(), {
+      ...(scaffold ? { scaffold } : {}),
+      ...(directory ? { directory } : {}),
+      ...(options.packageName ? { packageName: options.packageName } : {}),
+      list: options.list,
+    });
+  });
 
 program
   .command('init')

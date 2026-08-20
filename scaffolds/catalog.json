@@ -1,0 +1,12 @@
+{
+  "scaffolds": {
+    "app/react": {
+      "source": "app/react",
+      "description": "React application powered by Vite and TypeScript."
+    },
+    "library/react": {
+      "source": "library/react",
+      "description": "React library built with TypeScript, tsdown, and Vitest."
+    }
+  }
+}

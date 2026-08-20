@@ -1,0 +1,36 @@
+{
+  "name": "@paulhalleux/vite-config",
+  "version": "0.0.0",
+  "description": "Shared Vite configuration for React applications.",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.5"
+  },
+  "peerDependencies": {
+    "vite": ">=8.0.0 <9.0.0"
+  },
+  "devDependencies": {
+    "@paulhalleux/tsconfig": "workspace:*",
+    "@paulhalleux/tsdown-config": "workspace:*",
+    "tsdown": "^0.22.14",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.1"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

@@ -10,7 +10,7 @@ const resourcesDirectory = join(packageDirectory, 'resources');
 await rm(resourcesDirectory, { recursive: true, force: true });
 await mkdir(resourcesDirectory, { recursive: true });
 
-for (const directory of ['ai', 'profiles', 'templates']) {
+for (const directory of ['ai', 'profiles', 'scaffolds', 'templates']) {
   await cp(
     join(repositoryRoot, directory),
     join(resourcesDirectory, directory),

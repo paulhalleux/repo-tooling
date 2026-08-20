@@ -6,12 +6,25 @@ AI tooling.
 ## Commands
 
 ```bash
+pnpm exec repo create app/react my-app
+pnpm exec repo create library/react my-library
+# equivalent compact form:
+pnpm exec repo create library/react/my-library
 pnpm exec repo init --profile typescript-library
 pnpm exec repo sync
 pnpm exec repo check
 pnpm exec repo migrate
 pnpm exec repo ai list
 ```
+
+Use `repo create --list` to inspect available project scaffolds. Pass
+`--package-name @scope/name` when the package name should differ from the
+destination directory. Creation accepts a new or empty destination and never
+installs dependencies or initializes Git implicitly.
+
+The React scaffolds configure the `@paulhalleux` scope for GitHub
+Packages without writing credentials. Authenticate GitHub Packages in your
+user-level npm configuration before installing if you have not already done so.
 
 `repo sync` is intentionally the single materialization command. Repository
 files and AI resources use the same ownership and conflict rules.
