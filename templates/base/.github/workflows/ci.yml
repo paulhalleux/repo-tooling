@@ -11,4 +11,4 @@ permissions:
 
 jobs:
   ci:
-    uses: {{githubOwner}}/repo-tooling/.github/workflows/node-ci.yml@v1
+    uses: {{githubOwner}}/repo-tooling/.github/workflows/node-ci.yml@main
