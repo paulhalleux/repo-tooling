@@ -1,5 +1,12 @@
 # @paulhalleux/repo
 
+## 0.3.2
+
+### Patch Changes
+
+- a5de222: Make package resources canonical under `packages/repo/resources` and remove
+  build-time resource copying.
+
 ## 0.3.1
 
 ### Patch Changes
