@@ -1,7 +1,7 @@
 name = "architect"
 description = "Read-only architecture specialist for expensive-to-reverse decisions involving public API, ownership, state, package boundaries, extensibility, lifecycle, compatibility, or cross-cutting abstractions. Do not use for routine implementation."
 model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 model_verbosity = "low"
 sandbox_mode = "read-only"
 
