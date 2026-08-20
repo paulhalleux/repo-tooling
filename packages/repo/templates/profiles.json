@@ -3,7 +3,7 @@
     "base": {
       "files": [
         {
-          "source": "typescript-library/.github/workflows/ci.yml",
+          "source": "base/.github/workflows/ci.yml",
           "target": ".github/workflows/ci.yml"
         }
       ]

@@ -25,7 +25,7 @@ program
   .option(
     '-p, --profile <profiles...>',
     'Ordered repository profiles.',
-    ['typescript-library'],
+    ['base'],
   )
   .option('--github-owner <owner>', 'GitHub organization or user.')
   .option('--repository-name <name>', 'GitHub repository name.')
