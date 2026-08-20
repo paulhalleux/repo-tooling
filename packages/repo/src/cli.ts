@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
 
+import { runAiListCommand } from './commands/ai.js';
 import { runCheckCommand } from './commands/check.js';
 import { runInitCommand } from './commands/init.js';
 import { runMigrateCommand } from './commands/migrate.js';
@@ -25,7 +26,7 @@ program
   .option(
     '-p, --profile <profiles...>',
     'Ordered repository profiles.',
-    ['base'],
+    ['typescript-library'],
   )
   .option('--github-owner <owner>', 'GitHub organization or user.')
   .option('--repository-name <name>', 'GitHub repository name.')
@@ -70,6 +71,19 @@ program
   .action(async () => {
     const root = await findRepositoryRoot(process.cwd());
     await runCheckCommand(root);
+  });
+
+
+const aiCommand = program
+  .command('ai')
+  .description('Inspect project-scoped AI tooling selected by profiles.');
+
+aiCommand
+  .command('list')
+  .description('List selected skills, agents, and instruction fragments.')
+  .action(async () => {
+    const root = await findRepositoryRoot(process.cwd());
+    await runAiListCommand(root);
   });
 
 program

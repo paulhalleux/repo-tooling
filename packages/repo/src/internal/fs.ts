@@ -3,11 +3,12 @@ import {
   access,
   mkdir,
   readFile,
+  readdir,
   rename,
   rm,
   writeFile,
 } from 'node:fs/promises';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 
 import type { JsonValue } from '../types.js';
 
@@ -36,6 +37,17 @@ export async function readTextFile(path: string): Promise<string> {
   return readFile(path, 'utf8');
 }
 
+
+/**
+ * Reads a file without text decoding.
+ *
+ * @param path - Absolute filesystem path.
+ * @returns Exact file bytes.
+ */
+export async function readBinaryFile(path: string): Promise<Uint8Array> {
+  return readFile(path);
+}
+
 /**
  * Reads and parses a JSON file.
  *
@@ -45,6 +57,41 @@ export async function readTextFile(path: string): Promise<string> {
  */
 export async function readJsonFile(path: string): Promise<JsonValue> {
   return JSON.parse(await readTextFile(path)) as JsonValue;
+}
+
+/**
+ * Recursively lists regular files below a directory.
+ *
+ * Returned paths are relative to `directory` and use the host platform's path
+ * separators. Symbolic links are intentionally ignored so a distributed
+ * resource catalog cannot escape its package root through symlink traversal.
+ *
+ * @param directory - Absolute directory to traverse.
+ * @returns Sorted repository-relative file paths.
+ */
+export async function listFilesRecursive(
+  directory: string,
+): Promise<string[]> {
+  const files: string[] = [];
+
+  async function visit(currentDirectory: string, prefix: string): Promise<void> {
+    const entries = await readdir(currentDirectory, { withFileTypes: true });
+    entries.sort((left, right) => left.name.localeCompare(right.name));
+
+    for (const entry of entries) {
+      const absolutePath = join(currentDirectory, entry.name);
+      const relativePath = prefix ? join(prefix, entry.name) : entry.name;
+
+      if (entry.isDirectory()) {
+        await visit(absolutePath, relativePath);
+      } else if (entry.isFile()) {
+        files.push(relativePath);
+      }
+    }
+  }
+
+  await visit(directory, '');
+  return files;
 }
 
 /**
@@ -61,10 +108,26 @@ export async function writeTextFileAtomic(
   path: string,
   content: string,
 ): Promise<void> {
+  await writeFileAtomic(path, content);
+}
+
+/**
+ * Writes text or binary data atomically where possible.
+ *
+ * Parent directories are created automatically. The exact supplied bytes are
+ * preserved for binary resources such as skill assets.
+ *
+ * @param path - Absolute destination path.
+ * @param content - Text or exact bytes to write.
+ */
+export async function writeFileAtomic(
+  path: string,
+  content: string | Uint8Array,
+): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
 
   const tempPath = `${path}.repo-tooling-tmp-${process.pid}-${Date.now()}`;
-  await writeFile(tempPath, content, 'utf8');
+  await writeFile(tempPath, content);
   await rename(tempPath, path);
 }
 
@@ -91,11 +154,11 @@ export async function removeFile(path: string): Promise<void> {
 }
 
 /**
- * Computes a deterministic SHA-256 hash for text content.
+ * Computes a deterministic SHA-256 hash for text or binary content.
  *
  * @param content - Content to hash.
  * @returns Lowercase hexadecimal SHA-256 digest.
  */
-export function sha256(content: string): string {
-  return createHash('sha256').update(content, 'utf8').digest('hex');
+export function sha256(content: string | Uint8Array): string {
+  return createHash('sha256').update(content).digest('hex');
 }

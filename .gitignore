@@ -6,3 +6,4 @@ coverage/
 .data/
 **/bin/
 **/obj/
+**/resources

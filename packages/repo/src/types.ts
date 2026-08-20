@@ -30,13 +30,15 @@ export interface RepositoryConfig {
    * Ordered profiles applied to the repository.
    *
    * Later profiles may override managed files declared by earlier profiles.
+   * AI resources are composed additively and de-duplicated by name.
    */
   profiles: string[];
 
   /**
    * Variables made available to managed text templates.
    *
-   * Template references use `{{variableName}}`.
+   * Template references use `{{variableName}}`. AI resources are copied as
+   * raw files and are never template-rendered.
    */
   variables: Record<string, string>;
 }
@@ -46,7 +48,7 @@ export interface RepositoryConfig {
  */
 export interface ManagedFileDefinition {
   /**
-   * File path relative to the CLI package's `templates` directory.
+   * File path relative to the CLI package's distributed `resources` root.
    */
   source: string;
 
@@ -54,6 +56,40 @@ export interface ManagedFileDefinition {
    * Destination path relative to the consumer repository root.
    */
   target: string;
+
+  /**
+   * Whether `{{variable}}` placeholders should be rendered.
+   *
+   * Profile-managed repository templates default to `true`. AI resources are
+   * always materialized with `false` so prompts and examples remain byte-for-
+   * byte identical to their canonical source.
+   */
+  render?: boolean;
+}
+
+/**
+ * Project-scoped AI resources contributed by a repository profile.
+ */
+export interface RepositoryAiProfile {
+  /**
+   * Skill directory names resolved from `ai/skills/<name>`.
+   */
+  skills?: string[];
+
+  /**
+   * Custom agent names resolved from `ai/agents/<name>.toml`.
+   */
+  agents?: string[];
+
+  /**
+   * Shared instruction fragment names resolved from
+   * `ai/instructions/<name>.md`.
+   *
+   * Instruction fragments are materialized under
+   * `.repo-tooling/instructions/`; they are not automatically injected into
+   * `AGENTS.md`.
+   */
+  instructions?: string[];
 }
 
 /**
@@ -66,9 +102,14 @@ export interface RepositoryProfile {
   extends?: string[];
 
   /**
-   * Managed files contributed by the profile.
+   * Managed repository files contributed by the profile.
    */
   files?: ManagedFileDefinition[];
+
+  /**
+   * Project-scoped AI resources contributed by the profile.
+   */
+  ai?: RepositoryAiProfile;
 }
 
 /**
@@ -82,6 +123,41 @@ export interface RepositoryProfileCatalog {
 }
 
 /**
+ * Fully composed AI resource selection after profile inheritance resolution.
+ */
+export interface ResolvedRepositoryAiProfile {
+  /**
+   * Ordered, de-duplicated skill names.
+   */
+  skills: string[];
+
+  /**
+   * Ordered, de-duplicated custom agent names.
+   */
+  agents: string[];
+
+  /**
+   * Ordered, de-duplicated shared instruction fragment names.
+   */
+  instructions: string[];
+}
+
+/**
+ * Fully composed repository profile selection.
+ */
+export interface ResolvedRepositoryProfile {
+  /**
+   * Managed files after inheritance and target-path overrides are applied.
+   */
+  files: ManagedFileDefinition[];
+
+  /**
+   * AI resources selected by the composed profiles.
+   */
+  ai: ResolvedRepositoryAiProfile;
+}
+
+/**
  * State recorded for one CLI-managed file.
  */
 export interface ManagedFileLockEntry {
@@ -91,7 +167,7 @@ export interface ManagedFileLockEntry {
   hash: string;
 
   /**
-   * Template source used to generate the file.
+   * Resource source used to generate the file.
    */
   source: string;
 }

@@ -1,4 +1,4 @@
-import { join, normalize, resolve, sep } from 'node:path';
+import { posix, resolve, sep } from 'node:path';
 
 import type {
   ManagedFileDefinition,
@@ -8,12 +8,13 @@ import type {
 } from '../types.js';
 import {
   pathExists,
+  readBinaryFile,
   readTextFile,
   removeFile,
   sha256,
-  writeTextFileAtomic,
+  writeFileAtomic,
 } from './fs.js';
-import { TEMPLATES_DIRECTORY } from './catalog.js';
+import { RESOURCES_DIRECTORY } from './catalog.js';
 import { renderTemplate } from './template.js';
 
 /**
@@ -87,9 +88,9 @@ export async function synchronizeRepository(
     desiredTargets.add(target);
 
     const sourcePath = resolveWithinDirectory(
-      TEMPLATES_DIRECTORY,
+      RESOURCES_DIRECTORY,
       file.source,
-      'template source',
+      'resource source',
     );
     const destinationPath = resolveWithinDirectory(
       options.repositoryRoot,
@@ -97,8 +98,12 @@ export async function synchronizeRepository(
       'managed file target',
     );
 
-    const template = await readTextFile(sourcePath);
-    const desiredContent = renderTemplate(template, options.config.variables);
+    const desiredContent = file.render === false
+      ? await readBinaryFile(sourcePath)
+      : renderTemplate(
+          await readTextFile(sourcePath),
+          options.config.variables,
+        );
     const desiredHash = sha256(desiredContent);
     const previous = options.lock.files[target];
     const destinationExists = await pathExists(destinationPath);
@@ -107,7 +112,7 @@ export async function synchronizeRepository(
       if (options.check) {
         result.drifted.push(target);
       } else {
-        await writeTextFileAtomic(destinationPath, desiredContent);
+        await writeFileAtomic(destinationPath, desiredContent);
         result.changed.push(target);
       }
 
@@ -118,7 +123,9 @@ export async function synchronizeRepository(
       continue;
     }
 
-    const currentContent = await readTextFile(destinationPath);
+    const currentContent = file.render === false
+      ? await readBinaryFile(destinationPath)
+      : await readTextFile(destinationPath);
     const currentHash = sha256(currentContent);
 
     if (currentHash === desiredHash) {
@@ -150,7 +157,7 @@ export async function synchronizeRepository(
       continue;
     }
 
-    await writeTextFileAtomic(destinationPath, desiredContent);
+    await writeFileAtomic(destinationPath, desiredContent);
     result.changed.push(target);
     nextLock.files[target] = {
       hash: desiredHash,
@@ -173,7 +180,7 @@ export async function synchronizeRepository(
       continue;
     }
 
-    const currentContent = await readTextFile(destinationPath);
+    const currentContent = await readBinaryFile(destinationPath);
     const currentHash = sha256(currentContent);
     const isSafeToRemove = currentHash === previous.hash;
 
@@ -200,16 +207,17 @@ export async function synchronizeRepository(
  * Normalizes and validates a repository-relative path.
  *
  * @param path - Relative path supplied by the profile catalog.
- * @returns Normalized path using platform separators.
+ * @returns Normalized repository path using stable POSIX separators.
  * @throws {Error} When the path is absolute or escapes its root.
  */
 export function normalizeRelativePath(path: string): string {
-  const normalized = normalize(path);
+  const canonicalInput = path.replaceAll('\\', '/');
+  const normalized = posix.normalize(canonicalInput);
 
   if (
     normalized === '..'
-    || normalized.startsWith(`..${sep}`)
-    || resolve(normalized) === normalized
+    || normalized.startsWith('../')
+    || posix.isAbsolute(normalized)
   ) {
     throw new Error(`Managed path must stay relative: "${path}".`);
   }

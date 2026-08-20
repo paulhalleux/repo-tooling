@@ -6,8 +6,15 @@ export {
 } from './constants.js';
 
 export {
+  assertResourceName,
+  resolveAiManagedFiles,
+} from './internal/ai.js';
+
+export {
   loadProfileCatalog,
+  RESOURCES_DIRECTORY,
   resolveManagedFiles,
+  resolveRepositoryProfile,
 } from './internal/catalog.js';
 
 export {
@@ -30,10 +37,13 @@ export type {
   JsonValue,
   ManagedFileDefinition,
   ManagedFileLockEntry,
+  RepositoryAiProfile,
   RepositoryConfig,
   RepositoryLock,
   RepositoryProfile,
   RepositoryProfileCatalog,
+  ResolvedRepositoryAiProfile,
+  ResolvedRepositoryProfile,
   SyncResult,
 } from './types.js';
 

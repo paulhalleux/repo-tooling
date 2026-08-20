@@ -1,7 +1,7 @@
 {
   "name": "@paulhalleux/repo",
   "version": "0.1.2",
-  "description": "Repository bootstrap, synchronization, validation, and migration tooling.",
+  "description": "Repository bootstrap, synchronization, validation, migration, and project-scoped AI tooling.",
   "type": "module",
   "bin": {
     "repo": "./dist/cli.js"
@@ -14,10 +14,11 @@
   },
   "files": [
     "dist",
-    "templates"
+    "resources"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm run build:resources && tsc -p tsconfig.json",
+    "build:resources": "node scripts/build-resources.mjs",
     "check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -30,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/repo-tooling.git",
+    "url": "https://github.com/paulhalleux/repo-tooling.git",
     "directory": "packages/repo"
   },
   "publishConfig": {

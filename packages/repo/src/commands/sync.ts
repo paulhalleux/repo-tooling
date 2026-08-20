@@ -1,6 +1,10 @@
 import pc from 'picocolors';
 
-import { loadProfileCatalog, resolveManagedFiles } from '../internal/catalog.js';
+import { resolveAiManagedFiles } from '../internal/ai.js';
+import {
+  loadProfileCatalog,
+  resolveRepositoryProfile,
+} from '../internal/catalog.js';
 import {
   readRepositoryConfig,
   readRepositoryLock,
@@ -24,12 +28,17 @@ export interface SyncCommandOptions {
 }
 
 /**
- * Synchronizes repository-managed files.
+ * Synchronizes repository-managed files and project-scoped AI resources.
+ *
+ * Repository files, Codex skills, custom agents, and shared instruction
+ * fragments all flow through the same lock-based ownership model. Unknown
+ * project files are never removed, and locally modified managed files become
+ * conflicts unless `force` is explicitly enabled.
  *
  * @param repositoryRoot - Absolute repository root.
  * @param options - Synchronization behavior.
- * @throws {Error} When configuration, profiles, or templates are invalid, or
- * when check mode detects drift/conflicts.
+ * @throws {Error} When configuration, profiles, resources, or templates are
+ * invalid, or when check mode detects drift/conflicts.
  */
 export async function runSyncCommand(
   repositoryRoot: string,
@@ -38,7 +47,9 @@ export async function runSyncCommand(
   const config = await readRepositoryConfig(repositoryRoot);
   const lock = await readRepositoryLock(repositoryRoot);
   const catalog = await loadProfileCatalog();
-  const files = resolveManagedFiles(config.profiles, catalog);
+  const profile = resolveRepositoryProfile(config.profiles, catalog);
+  const aiFiles = await resolveAiManagedFiles(profile.ai);
+  const files = [...profile.files, ...aiFiles];
 
   const { result, lock: nextLock } = await synchronizeRepository({
     repositoryRoot,
@@ -61,7 +72,7 @@ export async function runSyncCommand(
   if (result.conflicts.length > 0) {
     throw new Error(
       'Managed-file conflicts were detected. Review the files or rerun with '
-      + '--force if the CLI should overwrite local changes.',
+      + '--force if repo-tooling should overwrite local changes.',
     );
   }
 
