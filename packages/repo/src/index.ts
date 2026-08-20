@@ -12,10 +12,11 @@ export {
 
 export {
   loadProfileCatalog,
-  RESOURCES_DIRECTORY,
   resolveManagedFiles,
   resolveRepositoryProfile,
 } from './internal/catalog.js';
+
+export { RESOURCES_DIRECTORY } from './internal/resources.js';
 
 export {
   parseRepositoryConfig,

@@ -15,7 +15,6 @@ import {
   resolve,
   sep,
 } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import type { JsonValue } from '../types.js';
 import {
@@ -27,6 +26,7 @@ import {
   writeFileAtomic,
 } from './fs.js';
 import { renderTemplate } from './template.js';
+import { RESOURCES_DIRECTORY } from './resources.js';
 
 const TEMPLATE_SUFFIX = '.tmpl';
 
@@ -44,8 +44,9 @@ export interface ProjectScaffoldCatalog {
 }
 
 /** Absolute path to the distributed scaffold resource root. */
-export const SCAFFOLDS_DIRECTORY = fileURLToPath(
-  new URL('../../resources/scaffolds/', import.meta.url),
+export const SCAFFOLDS_DIRECTORY = join(
+  RESOURCES_DIRECTORY,
+  'scaffolds',
 );
 
 const SCAFFOLD_CATALOG_PATH = join(SCAFFOLDS_DIRECTORY, 'catalog.json');

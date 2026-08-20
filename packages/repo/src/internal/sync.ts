@@ -14,7 +14,7 @@ import {
   sha256,
   writeFileAtomic,
 } from './fs.js';
-import { RESOURCES_DIRECTORY } from './catalog.js';
+import { RESOURCES_DIRECTORY } from './resources.js';
 import { renderTemplate } from './template.js';
 
 /**

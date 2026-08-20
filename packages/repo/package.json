@@ -17,9 +17,9 @@
     "resources"
   ],
   "scripts": {
-    "build": "pnpm run build:resources && tsc -p tsconfig.json",
-    "build:resources": "node scripts/build-resources.mjs",
-    "check": "tsc -p tsconfig.json --noEmit"
+    "build": "pnpm run check:resources && tsc -p tsconfig.json",
+    "check": "pnpm run check:resources && tsc -p tsconfig.json --noEmit",
+    "check:resources": "node scripts/check-resources.mjs"
   },
   "dependencies": {
     "commander": "^14.0.0",

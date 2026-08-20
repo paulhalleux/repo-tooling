@@ -10,7 +10,7 @@ pnpm exec repo create app/react my-app
 pnpm exec repo create library/react my-library
 # equivalent compact form:
 pnpm exec repo create library/react/my-library
-pnpm exec repo init --profile typescript-library
+pnpm exec repo init --profile base
 pnpm exec repo sync
 pnpm exec repo check
 pnpm exec repo migrate
@@ -37,7 +37,7 @@ Projects contain `.repo-tooling.json`:
 {
   "schemaVersion": 1,
   "profiles": [
-    "typescript-library"
+    "base"
   ],
   "variables": {
     "githubOwner": "paulhalleux",
@@ -51,24 +51,23 @@ AI preset is required.
 
 ## Profile catalog
 
-Canonical profiles live at the `repo-tooling` repository root in
-`profiles/catalog.json`:
+Canonical profiles live in `resources/profiles/catalog.json` beside the CLI
+code that consumes and distributes them:
 
 ```json
 {
   "profiles": {
-    "typescript-library": {
-      "extends": ["base"],
+    "base": {
       "files": [
         {
-          "source": "templates/typescript-library/.github/workflows/ci.yml",
+          "source": "templates/base/.github/workflows/ci.yml",
           "target": ".github/workflows/ci.yml"
         }
       ],
       "ai": {
-        "skills": ["typescript-library"],
+        "skills": ["architecture-design"],
         "agents": ["architect"],
-        "instructions": ["typescript"]
+        "instructions": []
       }
     }
   }
@@ -81,7 +80,7 @@ agents, and instruction fragments compose additively and are de-duplicated.
 
 ## AI layout
 
-Canonical AI resources live at the monorepo root:
+Canonical AI resources live in `resources/ai`:
 
 ```text
 ai/
@@ -128,7 +127,7 @@ AI resources are copied without template rendering. Repository templates render
 
 ## Distribution
 
-The canonical `ai/`, `profiles/`, and `templates/` directories stay at the
-repository root. `packages/repo/scripts/build-resources.mjs` copies them into
-`packages/repo/resources/` during `pnpm build`, and the published npm package
-contains only `dist/` plus those generated `resources/`.
+`resources/` is canonical package content and is published directly beside
+`dist/`. The build validates required resource entry points but does not copy or
+rewrite them, so development, tests, and published consumers read the same
+files.

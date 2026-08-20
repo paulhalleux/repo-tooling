@@ -4,8 +4,8 @@ import type {
   ManagedFileDefinition,
   ResolvedRepositoryAiProfile,
 } from '../types.js';
-import { RESOURCES_DIRECTORY } from './catalog.js';
 import { listFilesRecursive, pathExists } from './fs.js';
+import { RESOURCES_DIRECTORY } from './resources.js';
 
 const RESOURCE_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 

@@ -24,25 +24,23 @@ repo-tooling/
 │       ├── node-ci.yml     # Reusable Node/pnpm CI
 │       └── release.yml     # Package versioning and publishing
 │
-├── ai/
-│   ├── agents/             # Shared Codex agents
-│   └── skills/             # Shared Codex skills
-│
 ├── configs/
 │   ├── oxfmt/
 │   ├── oxlint/
 │   ├── tsconfig/
 │   ├── tsdown/
 │   ├── typedoc/
+│   ├── vite/
 │   └── vitest/
 │
 ├── packages/
 │   └── repo/               # @paulhalleux/repo CLI
-│
-├── profiles/
-│   └── catalog.json        # Repository profile definitions
-│
-├── templates/              # Files materialized by repo sync
+│       ├── resources/      # Canonical distributable resources
+│       │   ├── ai/
+│       │   ├── profiles/
+│       │   ├── scaffolds/
+│       │   └── templates/
+│       └── src/
 ├── package.json
 ├── pnpm-lock.yaml
 └── pnpm-workspace.yaml
@@ -59,6 +57,7 @@ Packages are published under the `@paulhalleux` scope through GitHub Packages.
 | `@paulhalleux/tsconfig`       | Shared TypeScript configurations                                                 |
 | `@paulhalleux/tsdown-config`  | Shared tsdown build configuration                                                |
 | `@paulhalleux/typedoc-config` | Shared TypeDoc configuration                                                     |
+| `@paulhalleux/vite-config`    | Shared Vite configuration for React applications                                |
 | `@paulhalleux/vitest-config`  | Shared Vitest configuration                                                      |
 | `@paulhalleux/repo`           | Repository bootstrap, synchronization, validation, migration, and AI tooling CLI |
 
@@ -115,6 +114,8 @@ pnpm add -D @paulhalleux/repo
 Available commands include:
 
 ```bash
+pnpm exec repo create app/react my-app
+pnpm exec repo create library/react my-library
 pnpm exec repo init --profile base
 pnpm exec repo sync
 pnpm exec repo check
@@ -159,7 +160,7 @@ There is deliberately no separate AI preset configuration.
 Canonical profiles are defined in:
 
 ```text
-profiles/catalog.json
+packages/repo/resources/profiles/catalog.json
 ```
 
 A profile can contribute normal repository files and AI resources:
@@ -212,11 +213,11 @@ For example:
 repo-tooling                         consumer repository
 ────────────                         ───────────────────
 
-templates/...              ──────►  .github/workflows/...
+resources/templates/...    ──────►  .github/workflows/...
 
-ai/skills/<skill>/         ──────►  .agents/skills/<skill>/
+resources/ai/skills/...    ──────►  .agents/skills/...
 
-ai/agents/<agent>.toml     ──────►  .codex/agents/<agent>.toml
+resources/ai/agents/...    ──────►  .codex/agents/...
 ```
 
 Repository templates can use variables such as:
@@ -275,7 +276,7 @@ This makes tooling updates reviewable rather than silently changing repositories
 
 ## AI tooling
 
-Shared AI resources live under:
+Shared AI resources live under `packages/repo/resources`:
 
 ```text
 ai/

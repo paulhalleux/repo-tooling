@@ -1,4 +1,4 @@
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
 import type {
   ManagedFileDefinition,
@@ -8,19 +8,15 @@ import type {
   ResolvedRepositoryProfile,
 } from '../types.js';
 import { readJsonFile } from './fs.js';
-
-/**
- * Absolute path to the CLI package's distributed resource root.
- */
-export const RESOURCES_DIRECTORY = fileURLToPath(
-  new URL('../../resources/', import.meta.url),
-);
+import { RESOURCES_DIRECTORY } from './resources.js';
 
 /**
  * Absolute path to the distributed repository profile catalog.
  */
-export const PROFILE_CATALOG_PATH = fileURLToPath(
-  new URL('../../resources/profiles/catalog.json', import.meta.url),
+export const PROFILE_CATALOG_PATH = join(
+  RESOURCES_DIRECTORY,
+  'profiles',
+  'catalog.json',
 );
 
 /**
