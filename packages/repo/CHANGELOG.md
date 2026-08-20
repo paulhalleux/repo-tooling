@@ -1,5 +1,11 @@
 # @paulhalleux/repo
 
+## 0.2.1
+
+### Patch Changes
+
+- 9522982: fix ci version
+
 ## 0.2.0
 
 ### Minor Changes
