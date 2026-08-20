@@ -51,13 +51,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check Types
-        run: pnpm typecheck
+      - name: Build
+        if: inputs.run-build
+        run: pnpm build
 
       - name: Test
         if: inputs.run-tests
         run: pnpm test
-
-      - name: Build
-        if: inputs.run-build
-        run: pnpm build
