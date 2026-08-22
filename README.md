@@ -7,8 +7,9 @@ This repository centralizes:
 * shared TypeScript and tooling configurations;
 * reusable GitHub Actions workflows;
 * repository bootstrap and synchronization through `@paulhalleux/repo`;
+* composable project scaffolding through `@paulhalleux/scaffold`;
+* one catalog of layers shared by both;
 * project-scoped Codex agents and skills;
-* repository profiles describing the development environment of a project;
 * package versioning and publication through Changesets and GitHub Packages.
 
 The goal is to keep individual repositories small and project-focused while sharing conventions, CI behavior, and AI development tooling without relying on machine-global configuration.
@@ -34,12 +35,13 @@ repo-tooling/
 │   └── vitest/
 │
 ├── packages/
-│   └── repo/               # @paulhalleux/repo CLI
-│       ├── resources/      # Canonical distributable resources
-│       │   ├── ai/
-│       │   ├── profiles/
-│       │   ├── scaffolds/
-│       │   └── templates/
+│   ├── repo/               # @paulhalleux/repo CLI
+│   │   ├── resources/      # Canonical distributable resources
+│   │   │   ├── ai/         # Skills and agents (also layer sources)
+│   │   │   ├── layers/     # Composable layers
+│   │   │   └── catalog.json
+│   │   └── src/
+│   └── scaffold/           # @paulhalleux/scaffold engine
 │       └── src/
 ├── package.json
 ├── pnpm-lock.yaml
@@ -60,6 +62,7 @@ Packages are published under the `@paulhalleux` scope through GitHub Packages.
 | `@paulhalleux/vite-config`    | Shared Vite configuration for React applications                                |
 | `@paulhalleux/vitest-config`  | Shared Vitest configuration                                                      |
 | `@paulhalleux/repo`           | Repository bootstrap, synchronization, validation, migration, and AI tooling CLI |
+| `@paulhalleux/scaffold`       | Composable, prompt-driven project scaffolding engine                             |
 
 Packages are independently versioned.
 
@@ -114,9 +117,12 @@ pnpm add -D @paulhalleux/repo
 Available commands include:
 
 ```bash
+pnpm exec repo create                       # guided: pick a scaffold, answer questions
+pnpm exec repo create monorepo my-repo
+pnpm exec repo create library/typescript my-lib
 pnpm exec repo create app/react my-app
-pnpm exec repo create library/react my-library
-pnpm exec repo init --profile base
+pnpm exec repo apply testing/vitest         # add a layer to an existing project
+pnpm exec repo init                         # subscribe to managed tooling layers
 pnpm exec repo sync
 pnpm exec repo check
 pnpm exec repo migrate
@@ -126,76 +132,61 @@ pnpm exec repo ai list
 ### Initialize a repository
 
 ```bash
-pnpm exec repo init --profile base
+pnpm exec repo init
 ```
 
-This creates a `.repo-tooling.json` describing the repository's selected profiles and template variables.
-
-For example:
+This creates a `.repo-tooling.json` recording the managed layers the repository
+subscribes to and the answers they render with:
 
 ```json
 {
-  "schemaVersion": 1,
-  "profiles": [
-    "base"
+  "schemaVersion": 2,
+  "layers": [
+    "repo/github-ci",
+    "ai/skills",
+    "ai/agents"
   ],
-  "variables": {
-    "githubOwner": "paulhalleux",
-    "repositoryName": "example-library"
-  }
-}
-```
-
-Profiles define the complete shared development environment for a repository, including:
-
-* managed repository files;
-* GitHub workflows;
-* Codex skills;
-* Codex agents.
-
-There is deliberately no separate AI preset configuration.
-
-## Repository profiles
-
-Canonical profiles are defined in:
-
-```text
-packages/repo/resources/profiles/catalog.json
-```
-
-A profile can contribute normal repository files and AI resources:
-
-```json
-{
-  "profiles": {
-    "base": {
-      "files": [
-        {
-          "source": "templates/base/.github/workflows/ci.yml",
-          "target": ".github/workflows/ci.yml"
-        }
-      ],
-      "ai": {
-        "skills": [
-          "architecture-design",
-          "architecture-review",
-          "typescript-api-design"
-        ],
-        "agents": [
-          "architect",
-          "reviewer",
-          "worker"
-        ],
-        "instructions": []
-      }
+  "answers": {
+    "shared": {
+      "githubOwner": "paulhalleux",
+      "repositoryName": "example-library"
+    },
+    "layers": {
+      "ai/skills": { "skills": ["refactor", "handoff"] },
+      "ai/agents": { "agents": ["reviewer"] }
     }
   }
 }
 ```
 
-Profiles may inherit from other profiles.
+## Layers
 
-Inherited profiles are applied first. Managed files declared by a later profile may override earlier declarations targeting the same path, while AI resources compose additively.
+Repository tooling and project scaffolding share one catalog, one template
+renderer, and one composition step:
+
+```text
+packages/repo/resources/catalog.json
+```
+
+A layer is a directory of files with its own questions, file rules, and
+actions. Scaffolds compose layers; repositories subscribe to them. A layer
+declares whether it is *managed*:
+
+* **unmanaged** layers - `testing/vitest`, `entry/react-app` - are written once
+  and handed over to the project;
+* **managed** layers - `repo/github-ci`, `ai/skills`, `ai/agents` - stay
+  tool-owned and are kept current by `repo sync`.
+
+Layers that offer a choice ask for it themselves. The AI layers, for instance,
+let each repository pick which skills and agents it installs:
+
+```bash
+pnpm exec repo init --set skills=refactor,debug-failure --set agents=reviewer
+pnpm exec repo ai list
+```
+
+Earlier versions used named profiles; `repo migrate` converts an existing
+`.repo-tooling.json` to the equivalent layers.
 
 ## Synchronization
 
@@ -205,29 +196,27 @@ The main synchronization command is:
 pnpm exec repo sync
 ```
 
-It materializes both regular repository resources and project-scoped AI tooling.
-
-For example:
-
-```text
-repo-tooling                         consumer repository
-────────────                         ───────────────────
-
-resources/templates/...    ──────►  .github/workflows/...
-
-resources/ai/skills/...    ──────►  .agents/skills/...
-
-resources/ai/agents/...    ──────►  .codex/agents/...
-```
-
-Repository templates can use variables such as:
+It re-renders every managed layer the repository subscribes to, using the
+answers recorded at initialization:
 
 ```text
-{{githubOwner}}
-{{repositoryName}}
+repo-tooling                          consumer repository
+────────────                          ───────────────────
+
+layers/repo-github-ci/...   ──────►  .github/workflows/...
+
+ai/skills/<selected>/...    ──────►  .agents/skills/...
+
+ai/agents/<selected>.toml   ──────►  .codex/agents/...
 ```
 
-AI resources are copied as-is and are not template-rendered.
+Only files ending in `.tmpl` are rendered, as Handlebars templates with the
+recorded answers - `{{githubOwner}}`, `{{repositoryName}}`, and any answer a
+layer asked for. Everything else, including AI resources and workflow YAML using
+`${{ }}`, is copied byte-for-byte.
+
+Deselecting a skill or agent and running `repo sync` removes it again, provided
+the file is still untouched.
 
 ## Managed-file ownership
 
@@ -311,7 +300,9 @@ ai/
     └── typescript-api-design/
 ```
 
-The profile determines which resources a project receives.
+The `ai/skills` and `ai/agents` layers ask each repository which of these it
+wants; the selection is recorded in `.repo-tooling.json` and re-applied by
+`repo sync`.
 
 After synchronization they become project-scoped Codex configuration:
 
@@ -329,7 +320,7 @@ Nothing needs to be installed into a user's global Codex configuration.
 
 Project-specific skills can be added directly beside shared skills. Because `repo sync` only owns resources recorded in its lock file, project-owned AI resources remain untouched.
 
-To inspect the AI resources selected by the active profiles:
+To inspect the AI resources the repository subscribes to:
 
 ```bash
 pnpm exec repo ai list
@@ -481,7 +472,9 @@ Configuration packages and reusable workflows should be preferred over duplicati
 A repository created from a template becomes independently owned afterward.
 
 **Profiles describe the shared development environment.**
-Repository files, CI, agents, and skills are composed through the same profile mechanism.
+Repository files, CI, agents, and skills are composed through the same layer
+mechanism as project scaffolding; a layer's `managed` flag is the only thing
+that decides whether it stays tool-owned.
 
 **Project code remains project-owned.**
 Synchronization is limited to explicitly managed resources.

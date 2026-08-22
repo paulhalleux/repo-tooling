@@ -12,57 +12,46 @@ import { fileURLToPath } from 'node:url';
 const packageDirectory = dirname(dirname(fileURLToPath(import.meta.url)));
 const resourcesDirectory = join(packageDirectory, 'resources');
 
-const profileCatalog = await readJsonResource('profiles/catalog.json');
-const scaffoldCatalog = await readJsonResource('scaffolds/catalog.json');
+const catalog = await readJsonResource('catalog.json');
 
-const profiles = readRecord(profileCatalog, 'profiles', 'Profile catalog');
-const scaffolds = readRecord(
-  scaffoldCatalog,
-  'scaffolds',
-  'Scaffold catalog',
-);
+assertObject(catalog, 'Catalog');
+const layers = readRecord(catalog, 'layers', 'Catalog');
+const scaffolds = readRecord(catalog, 'scaffolds', 'Catalog');
 
-for (const [name, profile] of Object.entries(profiles)) {
-  assertObject(profile, `Profile "${name}"`);
+for (const [id, layer] of Object.entries(layers)) {
+  assertObject(layer, `Layer "${id}"`);
+  await assertResourceDirectory(
+    readString(layer, 'source', `Layer "${id}"`),
+    true,
+  );
 
-  for (const parent of readStringArray(profile, 'extends', name)) {
-    if (!(parent in profiles)) {
-      throw new Error(`Profile "${name}" extends unknown profile "${parent}".`);
-    }
+  if (layer.target !== undefined) {
+    readString(layer, 'target', `Layer "${id}"`);
   }
 
-  for (const file of readObjectArray(profile, 'files', name)) {
-    const source = readString(file, 'source', `Profile "${name}" file`);
-    await assertResourceFile(source);
-  }
-
-  if (profile.ai !== undefined) {
-    assertObject(profile.ai, `Profile "${name}" AI selection`);
-
-    for (const skill of readStringArray(profile.ai, 'skills', name)) {
-      await assertResourceDirectory(`ai/skills/${skill}`, true);
-    }
-
-    for (const agent of readStringArray(profile.ai, 'agents', name)) {
-      await assertResourceFile(`ai/agents/${agent}.toml`);
-    }
-
-    for (const instruction of readStringArray(
-      profile.ai,
-      'instructions',
-      name,
-    )) {
-      await assertResourceFile(`ai/instructions/${instruction}.md`);
-    }
+  if (layer.managed !== undefined && typeof layer.managed !== 'boolean') {
+    throw new Error(`Layer "${id}".managed must be a boolean.`);
   }
 }
 
-assertAcyclicProfileInheritance(profiles);
-
 for (const [id, scaffold] of Object.entries(scaffolds)) {
   assertObject(scaffold, `Scaffold "${id}"`);
-  const source = readString(scaffold, 'source', `Scaffold "${id}"`);
-  await assertResourceDirectory(`scaffolds/${source}`, true);
+  readString(scaffold, 'description', `Scaffold "${id}"`);
+  const references = scaffold.layers ?? [];
+
+  if (!Array.isArray(references) || references.length === 0) {
+    throw new Error(`Scaffold "${id}".layers must be a non-empty array.`);
+  }
+
+  for (const reference of references) {
+    const layerId = typeof reference === 'string'
+      ? reference
+      : readString(reference, 'id', `Scaffold "${id}" layer`);
+
+    if (!(layerId in layers)) {
+      throw new Error(`Scaffold "${id}" references unknown layer "${layerId}".`);
+    }
+  }
 }
 
 async function readJsonResource(resource) {
@@ -77,12 +66,20 @@ async function readJsonResource(resource) {
   }
 }
 
-async function assertResourceFile(resource) {
-  await assertResourceType(resource, 'file');
-}
-
 async function assertResourceDirectory(resource, requireContent = false) {
-  const path = await assertResourceType(resource, 'directory');
+  const path = resolveResourcePath(resource);
+
+  try {
+    const metadata = await stat(path);
+
+    if (!metadata.isDirectory()) {
+      throw new Error('Expected a directory.');
+    }
+  } catch (error) {
+    throw new Error(`Required directory resource "${resource}" is invalid.`, {
+      cause: error,
+    });
+  }
 
   if (requireContent && !await directoryContainsFile(path)) {
     throw new Error(`Resource directory "${resource}" contains no files.`);
@@ -107,28 +104,6 @@ async function directoryContainsFile(directory) {
   return false;
 }
 
-async function assertResourceType(resource, expectedType) {
-  const path = resolveResourcePath(resource);
-
-  try {
-    const metadata = await stat(path);
-    const matches = expectedType === 'file'
-      ? metadata.isFile()
-      : metadata.isDirectory();
-
-    if (!matches) {
-      throw new Error(`Expected a ${expectedType}.`);
-    }
-
-    return path;
-  } catch (error) {
-    throw new Error(
-      `Required ${expectedType} resource "${resource}" is invalid.`,
-      { cause: error },
-    );
-  }
-}
-
 function resolveResourcePath(resource) {
   if (typeof resource !== 'string' || !resource) {
     throw new Error('Resource paths must be non-empty strings.');
@@ -149,7 +124,6 @@ function resolveResourcePath(resource) {
 }
 
 function readRecord(value, key, label) {
-  assertObject(value, label);
   const record = value[key];
   assertObject(record, `${label}.${key}`);
   return record;
@@ -157,64 +131,16 @@ function readRecord(value, key, label) {
 
 function readString(value, key, label) {
   const result = value[key];
+
   if (typeof result !== 'string') {
     throw new Error(`${label}.${key} must be a string.`);
   }
+
   return result;
-}
-
-function readStringArray(value, key, profileName) {
-  const entries = value[key] ?? [];
-  if (
-    !Array.isArray(entries)
-    || !entries.every((entry) => typeof entry === 'string')
-  ) {
-    throw new Error(
-      `Profile "${profileName}".${key} must be an array of strings.`,
-    );
-  }
-  return entries;
-}
-
-function readObjectArray(value, key, profileName) {
-  const entries = value[key] ?? [];
-  if (!Array.isArray(entries)) {
-    throw new Error(`Profile "${profileName}".${key} must be an array.`);
-  }
-  for (const entry of entries) {
-    assertObject(entry, `Profile "${profileName}".${key} entry`);
-  }
-  return entries;
 }
 
 function assertObject(value, label) {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     throw new Error(`${label} must be an object.`);
-  }
-}
-
-function assertAcyclicProfileInheritance(allProfiles) {
-  const visited = new Set();
-  const visiting = new Set();
-
-  const visit = (name) => {
-    if (visiting.has(name)) {
-      throw new Error(`Profile inheritance cycle detected at "${name}".`);
-    }
-    if (visited.has(name)) {
-      return;
-    }
-
-    visiting.add(name);
-    const profile = allProfiles[name];
-    for (const parent of profile.extends ?? []) {
-      visit(parent);
-    }
-    visiting.delete(name);
-    visited.add(name);
-  };
-
-  for (const name of Object.keys(allProfiles)) {
-    visit(name);
   }
 }

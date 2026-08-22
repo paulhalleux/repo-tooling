@@ -5,17 +5,6 @@ export {
   LOCK_FILE_NAME,
 } from './constants.js';
 
-export {
-  assertResourceName,
-  resolveAiManagedFiles,
-} from './internal/ai.js';
-
-export {
-  loadProfileCatalog,
-  resolveManagedFiles,
-  resolveRepositoryProfile,
-} from './internal/catalog.js';
-
 export { RESOURCES_DIRECTORY } from './internal/resources.js';
 
 export {
@@ -24,10 +13,13 @@ export {
   readRepositoryLock,
 } from './internal/config.js';
 
+export { planManagedFiles } from './internal/managed.js';
+
 export {
-  normalizeRelativePath,
-  synchronizeRepository,
-} from './internal/sync.js';
+  BUNDLED_SCAFFOLDS_DIRECTORY,
+  REPOSITORY_SCAFFOLDS_DIRECTORY,
+  resolveScaffoldSources,
+} from './internal/scaffold-sources.js';
 
 export {
   migrateRepositoryConfig,
@@ -36,21 +28,10 @@ export {
 export type {
   JsonPrimitive,
   JsonValue,
-  ManagedFileDefinition,
-  ManagedFileLockEntry,
-  RepositoryAiProfile,
+  RecordedAnswer,
   RepositoryConfig,
   RepositoryLock,
-  RepositoryProfile,
-  RepositoryProfileCatalog,
-  ResolvedRepositoryAiProfile,
-  ResolvedRepositoryProfile,
-  SyncResult,
 } from './types.js';
-
-export type {
-  SynchronizeRepositoryOptions,
-} from './internal/sync.js';
 
 export type {
   RepositoryConfigMigration,

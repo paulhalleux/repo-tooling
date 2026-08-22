@@ -22,13 +22,13 @@
     "check:resources": "node scripts/check-resources.mjs"
   },
   "dependencies": {
+    "@clack/prompts": "^1.7.0",
+    "@paulhalleux/scaffold": "workspace:*",
     "commander": "^14.0.0",
-    "picocolors": "^1.1.1",
-    "validate-npm-package-name": "^8.0.0"
+    "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "@types/validate-npm-package-name": "^4.0.2",
     "typescript": "^5.9.0"
   },
   "repository": {

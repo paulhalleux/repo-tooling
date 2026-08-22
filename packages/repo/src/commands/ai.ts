@@ -1,13 +1,11 @@
 import pc from 'picocolors';
 
-import {
-  loadProfileCatalog,
-  resolveRepositoryProfile,
-} from '../internal/catalog.js';
 import { readRepositoryConfig } from '../internal/config.js';
+import { planManagedFiles } from '../internal/managed.js';
+import { resolveScaffoldSources } from '../internal/scaffold-sources.js';
 
 /**
- * Lists the project-scoped AI resources selected by the repository profiles.
+ * Lists the project-scoped AI resources the repository subscribes to.
  *
  * This command is informational only. `repo sync` remains the single command
  * that materializes and updates repository-managed content.
@@ -18,12 +16,33 @@ export async function runAiListCommand(
   repositoryRoot: string,
 ): Promise<void> {
   const config = await readRepositoryConfig(repositoryRoot);
-  const catalog = await loadProfileCatalog();
-  const { ai } = resolveRepositoryProfile(config.profiles, catalog);
+  const { catalog } = await resolveScaffoldSources(repositoryRoot, []);
+  const { files } = await planManagedFiles(catalog, config);
 
-  printSection('Skills', ai.skills);
-  printSection('Agents', ai.agents);
-  printSection('Instruction fragments', ai.instructions);
+  printSection('Skills', collectNames(files, '.agents/skills/'));
+  printSection('Agents', collectNames(files, '.codex/agents/'));
+}
+
+function collectNames(
+  files: readonly { path: string }[],
+  prefix: string,
+): string[] {
+  const names = new Set<string>();
+
+  for (const file of files) {
+    if (!file.path.startsWith(prefix)) {
+      continue;
+    }
+
+    const rest = file.path.slice(prefix.length);
+    const [name] = rest.split('/');
+
+    if (name) {
+      names.add(name.replace(/\.toml$/, ''));
+    }
+  }
+
+  return [...names].sort();
 }
 
 function printSection(title: string, values: readonly string[]): void {
@@ -35,6 +54,6 @@ function printSection(title: string, values: readonly string[]): void {
   }
 
   for (const value of values) {
-    console.log(`  - ${value}`);
+    console.log(`  ${value}`);
   }
 }

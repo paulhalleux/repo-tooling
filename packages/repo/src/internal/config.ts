@@ -8,6 +8,8 @@ import {
 } from '../constants.js';
 import type {
   JsonValue,
+  RecordedAnswer,
+  RecordedAnswers,
   RepositoryConfig,
   RepositoryLock,
 } from '../types.js';
@@ -93,32 +95,82 @@ export function parseRepositoryConfig(
   }
 
   if (
-    !Array.isArray(value.profiles)
-    || !value.profiles.every((entry) => typeof entry === 'string')
+    !Array.isArray(value.layers)
+    || !value.layers.every((entry) => typeof entry === 'string')
   ) {
     throw new Error(
-      `${CONFIG_FILE_NAME}.profiles must be an array of strings.`,
-    );
-  }
-
-  if (
-    typeof value.variables !== 'object'
-    || value.variables === null
-    || Array.isArray(value.variables)
-    || !Object.values(value.variables).every(
-      (entry) => typeof entry === 'string',
-    )
-  ) {
-    throw new Error(
-      `${CONFIG_FILE_NAME}.variables must be an object of string values.`,
+      `${CONFIG_FILE_NAME}.layers must be an array of strings.`,
     );
   }
 
   return {
     schemaVersion: value.schemaVersion,
-    profiles: [...value.profiles],
-    variables: { ...value.variables } as Record<string, string>,
+    layers: [...value.layers],
+    answers: parseAnswers(value.answers),
   };
+}
+
+function parseAnswers(value: JsonValue | undefined): RecordedAnswers {
+  if (
+    typeof value !== 'object'
+    || value === null
+    || Array.isArray(value)
+  ) {
+    throw new Error(`${CONFIG_FILE_NAME}.answers must be an object.`);
+  }
+
+  // An early version of this schema stored one flat answer bag. Reading it as
+  // the shared scope keeps such a file working; each layer's own questions then
+  // fall back to their defaults on the next synchronization.
+  if (value.shared === undefined && value.layers === undefined) {
+    return { shared: parseAnswerRecord(value, 'answers'), layers: {} };
+  }
+
+  const layers: Record<string, Record<string, RecordedAnswer>> = {};
+
+  for (const [id, layerAnswers] of Object.entries(value.layers ?? {})) {
+    layers[id] = parseAnswerRecord(layerAnswers, `answers.layers.${id}`);
+  }
+
+  return {
+    shared: parseAnswerRecord(value.shared, 'answers.shared'),
+    layers,
+  };
+}
+
+function parseAnswerRecord(
+  value: JsonValue | undefined,
+  label: string,
+): Record<string, RecordedAnswer> {
+  if (value === undefined) {
+    return {};
+  }
+
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    throw new Error(`${CONFIG_FILE_NAME}.${label} must be an object.`);
+  }
+
+  const answers: Record<string, RecordedAnswer> = {};
+
+  for (const [name, answer] of Object.entries(value)) {
+    if (
+      typeof answer !== 'string'
+      && typeof answer !== 'boolean'
+      && !(
+        Array.isArray(answer)
+        && answer.every((entry) => typeof entry === 'string')
+      )
+    ) {
+      throw new Error(
+        `${CONFIG_FILE_NAME}.${label}.${name} must be a string, boolean, or `
+        + 'array of strings.',
+      );
+    }
+
+    answers[name] = Array.isArray(answer) ? [...answer] : answer;
+  }
+
+  return answers;
 }
 
 /**
@@ -148,7 +200,8 @@ export async function readRepositoryLock(
     typeof value !== 'object'
     || value === null
     || Array.isArray(value)
-    || value.schemaVersion !== CURRENT_LOCK_SCHEMA_VERSION
+    || typeof value.schemaVersion !== 'number'
+    || value.schemaVersion > CURRENT_LOCK_SCHEMA_VERSION
     || typeof value.files !== 'object'
     || value.files === null
     || Array.isArray(value.files)
@@ -166,17 +219,21 @@ export async function readRepositoryLock(
       || rawEntry === null
       || Array.isArray(rawEntry)
       || typeof rawEntry.hash !== 'string'
-      || typeof rawEntry.source !== 'string'
     ) {
       throw new Error(
         `${LOCK_FILE_NAME} contains an invalid entry for "${target}".`,
       );
     }
 
-    files[target] = {
-      hash: rawEntry.hash,
-      source: rawEntry.source,
-    };
+    // Version 1 recorded the resource path as "source"; the hash - the part
+    // drift detection depends on - is unchanged, so older locks stay usable.
+    const layer = typeof rawEntry.layer === 'string'
+      ? rawEntry.layer
+      : typeof rawEntry.source === 'string'
+        ? rawEntry.source
+        : '';
+
+    files[target] = { hash: rawEntry.hash, layer };
   }
 
   return {

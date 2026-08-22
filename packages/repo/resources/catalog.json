@@ -1,0 +1,758 @@
+{
+  "layers": {
+    "base/package": {
+      "source": "layers/base-package",
+      "description": "package.json, README, and .gitignore."
+    },
+    "base/typescript": {
+      "source": "layers/typescript",
+      "description": "TypeScript configuration and typecheck script.",
+      "variables": {
+        "tsconfigPreset": "library"
+      }
+    },
+    "registry/paulhalleux": {
+      "source": "layers/registry-paulhalleux",
+      "description": "Routes @paulhalleux packages to GitHub Packages."
+    },
+    "tooling/oxlint": {
+      "source": "layers/tooling-oxlint",
+      "description": "oxlint and oxfmt configuration."
+    },
+    "bundler/tsdown": {
+      "source": "layers/bundler-tsdown",
+      "description": "tsdown bundling and package entry points."
+    },
+    "bundler/vite": {
+      "source": "layers/bundler-vite",
+      "description": "Vite dev server, build, and HTML entry point."
+    },
+    "entry/typescript-library": {
+      "source": "layers/library-typescript",
+      "description": "TypeScript library entry point.",
+      "files": [
+        {
+          "path": "src/**/*.test.ts",
+          "when": "(includes features \"tests\")"
+        }
+      ]
+    },
+    "entry/react-library": {
+      "source": "layers/library-react",
+      "description": "React library entry point and peer dependencies.",
+      "variables": {
+        "tsconfigPreset": "react"
+      }
+    },
+    "entry/react-app": {
+      "source": "layers/app-react",
+      "description": "React application shell.",
+      "variables": {
+        "tsconfigPreset": "react"
+      }
+    },
+    "testing/vitest": {
+      "source": "layers/testing-vitest",
+      "description": "Vitest setup.",
+      "prompts": [
+        {
+          "type": "confirm",
+          "name": "coverage",
+          "message": "Add coverage reporting?",
+          "default": false
+        }
+      ]
+    },
+    "publish/github-packages": {
+      "source": "layers/publish-github-packages",
+      "description": "Publish configuration for GitHub Packages."
+    },
+    "workspace/pnpm": {
+      "source": "layers/workspace-pnpm",
+      "description": "pnpm workspace configuration and recursive scripts."
+    },
+    "workspace/changesets": {
+      "source": "layers/workspace-changesets",
+      "description": "Changesets configuration and release scripts."
+    },
+    "repo/github-ci": {
+      "source": "layers/repo-github-ci",
+      "description": "Shared CI workflow calling the reusable node-ci workflow.",
+      "managed": true
+    },
+    "ai/skills": {
+      "source": "ai/skills",
+      "target": ".agents/skills",
+      "description": "Project-scoped agent skills.",
+      "managed": true,
+      "prompts": [
+        {
+          "type": "multiselect",
+          "name": "skills",
+          "message": "Agent skills",
+          "optional": true,
+          "default": [
+            "adapter-boundaries",
+            "architecture-design",
+            "architecture-review",
+            "debug-failure",
+            "extensibility-design",
+            "frontend-library-development",
+            "frontend-library-review",
+            "handoff",
+            "idea-to-spec",
+            "implement-feature",
+            "jsdoc-contracts",
+            "library-testing",
+            "package-distribution",
+            "public-api-design",
+            "public-api-review",
+            "react-adapter",
+            "refactor",
+            "review-diff",
+            "simplicity-review",
+            "task-spec",
+            "typescript-api-design"
+          ],
+          "choices": [
+            {
+              "value": "adapter-boundaries",
+              "label": "Adapter boundaries"
+            },
+            {
+              "value": "architecture-design",
+              "label": "Architecture design"
+            },
+            {
+              "value": "architecture-review",
+              "label": "Architecture review"
+            },
+            {
+              "value": "debug-failure",
+              "label": "Debug failure"
+            },
+            {
+              "value": "extensibility-design",
+              "label": "Extensibility design"
+            },
+            {
+              "value": "frontend-library-development",
+              "label": "Frontend library development"
+            },
+            {
+              "value": "frontend-library-review",
+              "label": "Frontend library review"
+            },
+            {
+              "value": "handoff",
+              "label": "Handoff"
+            },
+            {
+              "value": "idea-to-spec",
+              "label": "Idea to spec"
+            },
+            {
+              "value": "implement-feature",
+              "label": "Implement feature"
+            },
+            {
+              "value": "jsdoc-contracts",
+              "label": "Jsdoc contracts"
+            },
+            {
+              "value": "library-testing",
+              "label": "Library testing"
+            },
+            {
+              "value": "package-distribution",
+              "label": "Package distribution"
+            },
+            {
+              "value": "public-api-design",
+              "label": "Public api design"
+            },
+            {
+              "value": "public-api-review",
+              "label": "Public api review"
+            },
+            {
+              "value": "react-adapter",
+              "label": "React adapter"
+            },
+            {
+              "value": "refactor",
+              "label": "Refactor"
+            },
+            {
+              "value": "review-diff",
+              "label": "Review diff"
+            },
+            {
+              "value": "simplicity-review",
+              "label": "Simplicity review"
+            },
+            {
+              "value": "task-spec",
+              "label": "Task spec"
+            },
+            {
+              "value": "typescript-api-design",
+              "label": "Typescript api design"
+            }
+          ]
+        }
+      ],
+      "files": [
+        {
+          "path": "adapter-boundaries/**",
+          "when": "(includes skills \"adapter-boundaries\")"
+        },
+        {
+          "path": "architecture-design/**",
+          "when": "(includes skills \"architecture-design\")"
+        },
+        {
+          "path": "architecture-review/**",
+          "when": "(includes skills \"architecture-review\")"
+        },
+        {
+          "path": "debug-failure/**",
+          "when": "(includes skills \"debug-failure\")"
+        },
+        {
+          "path": "extensibility-design/**",
+          "when": "(includes skills \"extensibility-design\")"
+        },
+        {
+          "path": "frontend-library-development/**",
+          "when": "(includes skills \"frontend-library-development\")"
+        },
+        {
+          "path": "frontend-library-review/**",
+          "when": "(includes skills \"frontend-library-review\")"
+        },
+        {
+          "path": "handoff/**",
+          "when": "(includes skills \"handoff\")"
+        },
+        {
+          "path": "idea-to-spec/**",
+          "when": "(includes skills \"idea-to-spec\")"
+        },
+        {
+          "path": "implement-feature/**",
+          "when": "(includes skills \"implement-feature\")"
+        },
+        {
+          "path": "jsdoc-contracts/**",
+          "when": "(includes skills \"jsdoc-contracts\")"
+        },
+        {
+          "path": "library-testing/**",
+          "when": "(includes skills \"library-testing\")"
+        },
+        {
+          "path": "package-distribution/**",
+          "when": "(includes skills \"package-distribution\")"
+        },
+        {
+          "path": "public-api-design/**",
+          "when": "(includes skills \"public-api-design\")"
+        },
+        {
+          "path": "public-api-review/**",
+          "when": "(includes skills \"public-api-review\")"
+        },
+        {
+          "path": "react-adapter/**",
+          "when": "(includes skills \"react-adapter\")"
+        },
+        {
+          "path": "refactor/**",
+          "when": "(includes skills \"refactor\")"
+        },
+        {
+          "path": "review-diff/**",
+          "when": "(includes skills \"review-diff\")"
+        },
+        {
+          "path": "simplicity-review/**",
+          "when": "(includes skills \"simplicity-review\")"
+        },
+        {
+          "path": "task-spec/**",
+          "when": "(includes skills \"task-spec\")"
+        },
+        {
+          "path": "typescript-api-design/**",
+          "when": "(includes skills \"typescript-api-design\")"
+        }
+      ]
+    },
+    "ai/agents": {
+      "source": "ai/agents",
+      "target": ".codex/agents",
+      "description": "Project-scoped custom agents.",
+      "managed": true,
+      "prompts": [
+        {
+          "type": "multiselect",
+          "name": "agents",
+          "message": "Custom agents",
+          "optional": true,
+          "default": [
+            "architect",
+            "explorer",
+            "reviewer",
+            "tester",
+            "worker"
+          ],
+          "choices": [
+            {
+              "value": "architect",
+              "label": "Architect"
+            },
+            {
+              "value": "explorer",
+              "label": "Explorer"
+            },
+            {
+              "value": "reviewer",
+              "label": "Reviewer"
+            },
+            {
+              "value": "tester",
+              "label": "Tester"
+            },
+            {
+              "value": "worker",
+              "label": "Worker"
+            }
+          ]
+        }
+      ],
+      "files": [
+        {
+          "path": "architect.toml",
+          "when": "(includes agents \"architect\")"
+        },
+        {
+          "path": "explorer.toml",
+          "when": "(includes agents \"explorer\")"
+        },
+        {
+          "path": "reviewer.toml",
+          "when": "(includes agents \"reviewer\")"
+        },
+        {
+          "path": "tester.toml",
+          "when": "(includes agents \"tester\")"
+        },
+        {
+          "path": "worker.toml",
+          "when": "(includes agents \"worker\")"
+        }
+      ]
+    }
+  },
+  "scaffolds": {
+    "app/react": {
+      "description": "React application powered by Vite and TypeScript.",
+      "prompts": [
+        {
+          "type": "text",
+          "name": "packageName",
+          "message": "Package name",
+          "default": "{{projectName}}",
+          "validate": {
+            "rule": "npm-package-name"
+          }
+        },
+        {
+          "type": "text",
+          "name": "description",
+          "message": "Package description",
+          "default": "A React application."
+        },
+        {
+          "type": "select",
+          "name": "license",
+          "message": "License",
+          "default": "UNLICENSED",
+          "choices": [
+            {
+              "value": "MIT"
+            },
+            {
+              "value": "Apache-2.0"
+            },
+            {
+              "value": "UNLICENSED",
+              "description": "Private package, never published."
+            }
+          ]
+        },
+        {
+          "type": "multiselect",
+          "name": "features",
+          "message": "Features",
+          "default": [
+            "tests"
+          ],
+          "optional": true,
+          "choices": [
+            {
+              "value": "tests",
+              "label": "Vitest test setup"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "id": "base/package"
+        },
+        {
+          "id": "registry/paulhalleux"
+        },
+        {
+          "id": "base/typescript"
+        },
+        {
+          "id": "tooling/oxlint"
+        },
+        {
+          "id": "bundler/vite"
+        },
+        {
+          "id": "entry/react-app"
+        },
+        {
+          "id": "testing/vitest",
+          "when": "(includes features \"tests\")"
+        }
+      ]
+    },
+    "library/react": {
+      "description": "React library built with TypeScript, tsdown, and Vitest.",
+      "prompts": [
+        {
+          "type": "text",
+          "name": "packageName",
+          "message": "Package name",
+          "default": "{{projectName}}",
+          "validate": {
+            "rule": "npm-package-name"
+          }
+        },
+        {
+          "type": "text",
+          "name": "description",
+          "message": "Package description",
+          "default": "A React library."
+        },
+        {
+          "type": "select",
+          "name": "license",
+          "message": "License",
+          "default": "MIT",
+          "choices": [
+            {
+              "value": "MIT"
+            },
+            {
+              "value": "Apache-2.0"
+            },
+            {
+              "value": "UNLICENSED",
+              "description": "Private package, never published."
+            }
+          ]
+        },
+        {
+          "type": "multiselect",
+          "name": "features",
+          "message": "Features",
+          "default": [
+            "tests"
+          ],
+          "optional": true,
+          "choices": [
+            {
+              "value": "tests",
+              "label": "Vitest test setup"
+            },
+            {
+              "value": "publish",
+              "label": "Publish to GitHub Packages",
+              "description": "Adds publishConfig for the GitHub Packages registry."
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "id": "base/package"
+        },
+        {
+          "id": "registry/paulhalleux"
+        },
+        {
+          "id": "base/typescript"
+        },
+        {
+          "id": "tooling/oxlint"
+        },
+        {
+          "id": "bundler/tsdown"
+        },
+        {
+          "id": "entry/react-library"
+        },
+        {
+          "id": "testing/vitest",
+          "when": "(includes features \"tests\")"
+        },
+        {
+          "id": "publish/github-packages",
+          "when": "(includes features \"publish\")"
+        }
+      ]
+    },
+    "library/typescript": {
+      "description": "TypeScript library built with tsdown, oxlint, and Vitest.",
+      "prompts": [
+        {
+          "type": "text",
+          "name": "packageName",
+          "message": "Package name",
+          "default": "{{projectName}}",
+          "validate": {
+            "rule": "npm-package-name"
+          }
+        },
+        {
+          "type": "text",
+          "name": "description",
+          "message": "Package description",
+          "default": "A TypeScript library."
+        },
+        {
+          "type": "select",
+          "name": "license",
+          "message": "License",
+          "default": "MIT",
+          "choices": [
+            {
+              "value": "MIT"
+            },
+            {
+              "value": "Apache-2.0"
+            },
+            {
+              "value": "UNLICENSED",
+              "description": "Private package, never published."
+            }
+          ]
+        },
+        {
+          "type": "multiselect",
+          "name": "features",
+          "message": "Features",
+          "default": [
+            "tests"
+          ],
+          "optional": true,
+          "choices": [
+            {
+              "value": "tests",
+              "label": "Vitest test setup"
+            },
+            {
+              "value": "publish",
+              "label": "Publish to GitHub Packages",
+              "description": "Adds publishConfig for the GitHub Packages registry."
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "id": "base/package"
+        },
+        {
+          "id": "registry/paulhalleux"
+        },
+        {
+          "id": "base/typescript"
+        },
+        {
+          "id": "tooling/oxlint"
+        },
+        {
+          "id": "bundler/tsdown"
+        },
+        {
+          "id": "entry/typescript-library"
+        },
+        {
+          "id": "testing/vitest",
+          "when": "(includes features \"tests\")"
+        },
+        {
+          "id": "publish/github-packages",
+          "when": "(includes features \"publish\")"
+        }
+      ]
+    },
+    "monorepo": {
+      "description": "pnpm monorepo with workspace scripts, CI, and releases.",
+      "prompts": [
+        {
+          "type": "text",
+          "name": "packageName",
+          "message": "Repository name",
+          "default": "{{projectName}}",
+          "validate": {
+            "rule": "npm-package-name"
+          }
+        },
+        {
+          "type": "text",
+          "name": "description",
+          "message": "Description",
+          "default": "A pnpm monorepo."
+        },
+        {
+          "type": "select",
+          "name": "license",
+          "message": "License",
+          "default": "MIT",
+          "choices": [
+            {
+              "value": "MIT"
+            },
+            {
+              "value": "Apache-2.0"
+            },
+            {
+              "value": "UNLICENSED",
+              "description": "Private, never published."
+            }
+          ]
+        },
+        {
+          "type": "multiselect",
+          "name": "features",
+          "message": "Repository features",
+          "default": [
+            "ci",
+            "changesets"
+          ],
+          "optional": true,
+          "choices": [
+            {
+              "value": "ci",
+              "label": "GitHub Actions workflow"
+            },
+            {
+              "value": "changesets",
+              "label": "Changesets versioning and releases"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "githubOwner",
+          "message": "GitHub owner",
+          "default": "paulhalleux",
+          "when": "(includes features \"ci\")"
+        },
+        {
+          "type": "confirm",
+          "name": "git",
+          "message": "Initialize a git repository?",
+          "default": true
+        },
+        {
+          "type": "confirm",
+          "name": "install",
+          "message": "Install dependencies now?",
+          "default": false
+        }
+      ],
+      "layers": [
+        {
+          "id": "base/package"
+        },
+        {
+          "id": "registry/paulhalleux"
+        },
+        {
+          "id": "workspace/pnpm"
+        },
+        {
+          "id": "workspace/changesets",
+          "when": "(includes features \"changesets\")"
+        },
+        {
+          "id": "repo/github-ci",
+          "when": "(includes features \"ci\")"
+        }
+      ],
+      "actions": [
+        {
+          "type": "run",
+          "when": "install",
+          "command": "pnpm",
+          "args": [
+            "install"
+          ],
+          "label": "Install dependencies"
+        },
+        {
+          "type": "git-init",
+          "when": "git",
+          "commit": "chore: scaffold {{packageName}}"
+        },
+        {
+          "type": "message",
+          "when": "(not install)",
+          "text": "pnpm install"
+        },
+        {
+          "type": "message",
+          "text": "repo create library/typescript packages/<name>"
+        }
+      ]
+    },
+    "repo/base": {
+      "description": "Managed repository tooling: shared CI workflow and AI resources.",
+      "prompts": [
+        {
+          "type": "text",
+          "name": "githubOwner",
+          "message": "GitHub owner",
+          "default": "paulhalleux"
+        },
+        {
+          "type": "text",
+          "name": "repositoryName",
+          "message": "Repository name",
+          "default": "{{projectName}}"
+        }
+      ],
+      "layers": [
+        {
+          "id": "repo/github-ci"
+        },
+        {
+          "id": "ai/skills"
+        },
+        {
+          "id": "ai/agents"
+        }
+      ]
+    }
+  }
+}

@@ -1,12 +1,12 @@
 /**
  * Current `.repo-tooling.json` schema version.
  */
-export const CURRENT_CONFIG_SCHEMA_VERSION = 1;
+export const CURRENT_CONFIG_SCHEMA_VERSION = 2;
 
 /**
  * Current `.repo-tooling.lock.json` schema version.
  */
-export const CURRENT_LOCK_SCHEMA_VERSION = 1;
+export const CURRENT_LOCK_SCHEMA_VERSION = 2;
 
 /**
  * Repository configuration file name.

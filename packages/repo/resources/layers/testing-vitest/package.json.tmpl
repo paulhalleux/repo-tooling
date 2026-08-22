@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test",
+    "test": "vitest run --passWithNoTests"{{#if coverage}},
+    "test:coverage": "vitest run --coverage"{{/if}}
+  },
+  "devDependencies": {
+    "@paulhalleux/vitest-config": "^0.1.0",{{#if coverage}}
+    "@vitest/coverage-v8": "^3.2.0",{{/if}}
+    "vitest": "^3.2.0"
+  }
+}

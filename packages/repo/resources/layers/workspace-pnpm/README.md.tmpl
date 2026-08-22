@@ -1,0 +1,27 @@
+# `{{packageName}}`
+
+{{description}}
+
+pnpm workspace scaffolded with `@paulhalleux/repo`.
+
+## Layout
+
+```text
+packages/    # workspace packages
+```
+
+## Scripts
+
+- `pnpm build` - build every package that defines a build script.
+- `pnpm check` - run every package's checks.
+- `pnpm test` - run every package's tests.
+
+## Adding a package
+
+```bash
+pnpm exec repo create library/typescript packages/my-library
+```
+
+The included `.npmrc` routes `@paulhalleux` tooling packages to GitHub
+Packages. Authenticate that registry in your user-level npm configuration
+before running `pnpm install` if needed.

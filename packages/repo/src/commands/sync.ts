@@ -1,16 +1,15 @@
 import pc from 'picocolors';
 
-import { resolveAiManagedFiles } from '../internal/ai.js';
-import {
-  loadProfileCatalog,
-  resolveRepositoryProfile,
-} from '../internal/catalog.js';
+import { syncPlan } from '@paulhalleux/scaffold';
+
 import {
   readRepositoryConfig,
   readRepositoryLock,
   writeRepositoryLock,
 } from '../internal/config.js';
-import { synchronizeRepository } from '../internal/sync.js';
+import { planManagedFiles } from '../internal/managed.js';
+import { resolveScaffoldSources } from '../internal/scaffold-sources.js';
+import { CURRENT_LOCK_SCHEMA_VERSION } from '../constants.js';
 
 /**
  * Options accepted by `repo sync`.
@@ -25,20 +24,25 @@ export interface SyncCommandOptions {
    * Overwrite or remove conflicting managed files.
    */
   force: boolean;
+
+  /**
+   * Extra catalog sources searched for subscribed layers.
+   */
+  sources?: string[];
 }
 
 /**
- * Synchronizes repository-managed files and project-scoped AI resources.
+ * Synchronizes the managed layers a repository subscribes to.
  *
- * Repository files, Codex skills, custom agents, and shared instruction
- * fragments all flow through the same lock-based ownership model. Unknown
- * project files are never removed, and locally modified managed files become
- * conflicts unless `force` is explicitly enabled.
+ * The CI workflow, agent skills, and custom agents are all ordinary catalog
+ * layers marked `managed`, so they flow through the same lock-based ownership
+ * model: unknown project files are never removed, and locally modified managed
+ * files become conflicts unless `force` is explicitly enabled.
  *
  * @param repositoryRoot - Absolute repository root.
  * @param options - Synchronization behavior.
- * @throws {Error} When configuration, profiles, resources, or templates are
- * invalid, or when check mode detects drift/conflicts.
+ * @throws {Error} When configuration or layers are invalid, or when check mode
+ * detects drift or conflicts.
  */
 export async function runSyncCommand(
   repositoryRoot: string,
@@ -46,19 +50,25 @@ export async function runSyncCommand(
 ): Promise<void> {
   const config = await readRepositoryConfig(repositoryRoot);
   const lock = await readRepositoryLock(repositoryRoot);
-  const catalog = await loadProfileCatalog();
-  const profile = resolveRepositoryProfile(config.profiles, catalog);
-  const aiFiles = await resolveAiManagedFiles(profile.ai);
-  const files = [...profile.files, ...aiFiles];
-
-  const { result, lock: nextLock } = await synchronizeRepository({
+  const { catalog } = await resolveScaffoldSources(
     repositoryRoot,
-    config,
-    lock,
-    files,
+    options.sources ?? [],
+  );
+
+  const { files, emptyLayers } = await planManagedFiles(catalog, config);
+  const { result, managed } = await syncPlan(files, {
+    destination: repositoryRoot,
+    previous: lock.files,
     check: options.check,
     force: options.force,
   });
+
+  for (const layer of emptyLayers) {
+    console.log(
+      `${pc.yellow('empty'.padEnd(8))} ${layer} contributes no files for the `
+      + 'recorded answers',
+    );
+  }
 
   printPaths('updated', result.changed, pc.green);
   printPaths('removed', result.removed, pc.yellow);
@@ -66,7 +76,10 @@ export async function runSyncCommand(
   printPaths('conflict', result.conflicts, pc.red);
 
   if (!options.check) {
-    await writeRepositoryLock(repositoryRoot, nextLock);
+    await writeRepositoryLock(repositoryRoot, {
+      schemaVersion: CURRENT_LOCK_SCHEMA_VERSION,
+      files: managed,
+    });
   }
 
   if (result.conflicts.length > 0) {

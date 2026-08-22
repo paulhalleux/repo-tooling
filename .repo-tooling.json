@@ -1,10 +1,14 @@
 {
-  "schemaVersion": 1,
-  "profiles": [
-    "base"
+  "schemaVersion": 2,
+  "layers": [
+    "ai/skills",
+    "ai/agents"
   ],
-  "variables": {
-    "githubOwner": "paulhalleux",
-    "repositoryName": "repo-tooling"
+  "answers": {
+    "shared": {
+      "githubOwner": "paulhalleux",
+      "repositoryName": "repo-tooling"
+    },
+    "layers": {}
   }
 }
